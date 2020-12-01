@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Header from './Header';
 
-function App() {
-  return (
+const navigation = {
+  brand: {name:"The Weather Site",to:"/"},
+  links: [
+    {name: "Home", to:"/"},
+    {name: "All Locations", to:"/alllocations"},
+    {name: "Test",to:"/test"}
+  ]
+}
+
+export default class App extends Component {  
+  public render(){
+  const {links,brand} = navigation;
+  return (    
     <div className="App">
-      <header className="App-header">
+      <Header brand={brand} links={links}/>
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
@@ -18,9 +30,8 @@ function App() {
         >
           Learn React
         </a>
-      </header>
     </div>
   );
+  }
 }
 
-export default App;
