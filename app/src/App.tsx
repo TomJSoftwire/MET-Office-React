@@ -1,16 +1,8 @@
 import React, { Component,useState,useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Header from './Header';
-import LocationWeatherDisplay from './LocationWeatherDisplay';
+import LocationWeatherDisplay,{WeatherDataInput} from './LocationWeatherDisplay';
 
-type weatherDataInput = {
-  SiteRep : {
-      DV :{
-          type:string
-      }
-  }
-}
 
 const navigation = {
   brand: {name:"The Weather Site",to:"/"},
@@ -24,8 +16,9 @@ interface IProps {
 }
 
 interface IState {
+  locationName: string,
   locationId : string,
-  locationData: weatherDataInput
+  locationData: WeatherDataInput|undefined
 }
 
 
@@ -33,14 +26,9 @@ export default class App extends Component<IProps,IState> {
   constructor(props:any){
     super(props);
     this.state = {
+      locationName:"TEST",
       locationId :"3840",
-      locationData: {
-        SiteRep : {
-            DV :{
-                type: "TEST"
-            }
-        }
-      }
+      locationData: undefined
     }
   }
 fetchLocationData(){
@@ -50,15 +38,22 @@ fetchLocationData(){
         "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/" + this.state.locationId + "?res=3hourly&key=" + key
   fetch(targetUrl)
         .then(response => response.json())
-        .then((json:weatherDataInput) => {
+        .then((json:WeatherDataInput) => {
             this.setState({locationData:json})
         })
 }
-componentDidUpdate(){
-  //this.fetchLocationData()
-}
 componentDidMount(){
   //this.fetchLocationData()
+}
+
+handleClick(){
+  this.fetchLocationData()
+}
+
+handleChange(event: React.ChangeEvent<HTMLInputElement>){
+  this.setState({
+    locationName: event.target.value
+  });
 }
 
   public render(){
@@ -66,7 +61,7 @@ componentDidMount(){
   return (    
     <div className="App">
       <Header brand={brand} links={links} />
-        <LocationWeatherDisplay locationData={this.state.locationData}/>
+        {this.state.locationData && <LocationWeatherDisplay locationData={this.state.locationData}/>}
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -79,14 +74,15 @@ componentDidMount(){
           Learn React
         </a>
       <div>
-        <Forecast />
+        <Forecast handleClick={() => this.handleClick()} handleChange={(e:React.ChangeEvent<HTMLInputElement>) => this.handleChange(e)} locationName={this.state.locationName}/>
       </div>
     </div>
   );
   }
 }
 
-class LocationInput extends React.Component<{handleClick: () => void, 
+class LocationInput extends React.Component<{
+  handleClick: () => void, 
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void}, {}> {
 
   render(){
@@ -134,37 +130,22 @@ class LocationMatches extends React.Component <{location: string}, {}>{
 }
 
 
-class Forecast extends React.Component<{}, {location: string}> {
+class Forecast extends React.Component<{locationName : string, handleClick : () => void,handleChange : (event : React.ChangeEvent<HTMLInputElement>) => void}, {location: string}> {
 
-  constructor(props: string){
-    super(props);
-    this.state = {
-      location: '',
-    }
-  }
 
-  handleClick(){
-    alert(this.state.location);
-  }
-
-  handleChange(event: React.ChangeEvent<HTMLInputElement>){
-    this.setState({
-      location: event.target.value
-    });
-  }
+  
 
   render(){
     return (
       <div>
         <LocationInput 
-          handleClick={() => this.handleClick()} 
-          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
+          handleClick={() => this.props.handleClick()} 
+          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}
         />
-        <LocationMatches location={this.state.location} />
+        <LocationMatches location={this.props.locationName} />
       </div>
     );
   }
 
 }
 
-export default App;
