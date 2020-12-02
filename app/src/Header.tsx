@@ -60,7 +60,7 @@ const A = styled.a`
 
 function Header(props: {
     brand: {name:string,to:string},
-    links: Array<{name:string,to:string}>
+    links: Array<{name:string,to:string}>,
 }){
 
     const {brand,links} = props;
@@ -69,7 +69,6 @@ function Header(props: {
             <Li key={link.name}><A href={link.to}>{link.name}</A></Li>
         )
     })
-
     return(
         <Navbar>
             <Brand href={brand.to}>{brand.name}</Brand>
