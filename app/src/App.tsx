@@ -91,6 +91,10 @@ handleClick(){
   }
 }
 
+handleLocationClick(locationName: string){
+  this.setState({location: locationName}, () => this.handleClick())
+}
+
 matchLocation(data: locationMetaData){
   console.log("Matching: " + this.state.location + " with " + data.name)
   if (data.name === this.state.location){
@@ -112,9 +116,10 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
 
       <div>
         <Forecast 
-          handleClick={() => this.handleClick()} 
+          handleClick={(name: string) => this.handleLocationClick(name)} 
           handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
           location={this.state.location}
+          locations={this.state.locationMetaData.Locations.Location}
         />
         {this.state.locationData && <LocationWeatherDisplay locationData={this.state.locationData}/>}
 
@@ -124,9 +129,7 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
   }
 }
 
-class LocationInput extends React.Component<{
-  handleClick: () => void, 
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void}, {}> {
+class LocationInput extends React.Component<{handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void}, {}> {
 
   render(){
     return (
@@ -137,53 +140,48 @@ class LocationInput extends React.Component<{
           placeholder="Enter Location" 
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}>
         </input>
-        <button type="submit" onClick={() => this.props.handleClick()}>Submit</button>
       </div>
     );
   }
 }
 
-class LocationMatches extends React.Component <{location: string}, {}>{
+class LocationMatches extends React.Component <{location: string, locations: locationMetaData[],
+  handleClick: (name: string) => void}, {}>{
 
   render(){
     let i: number;
-    let locations: string[] = ['London Airport', 'Liverpool', 'Leeds', 'Manchester', 'Manchester Airport', 'Manchester Picadilly', 
-                               'Mold', 'Aldershot', 'Abergele', 'Bodelwyddan', 'Bangor', 'Chester', 'Bristol', 'Brighton', 'Cardiff',
-                               'York', 'Edinburgh', 'Rhyl', 'Prestatyn', 'New Brighton', 'Fflint', 'Abcot', 'Aberystwyth', 'Bath',
-                               'Blackpool', 'Blackburn'];
     let matches: string[] = [];
 
-    for(i = 0; i < locations.length; i++){
-      if(locations[i].toLowerCase().startsWith(this.props.location.toLowerCase())){
-        matches.push(locations[i]);
+    for(i = 0; i < this.props.locations.length; i++){
+      if (this.props.locations[i].name.toLowerCase().startsWith(this.props.location.toLowerCase())){
+        matches.push(this.props.locations[i].name)
       }
     }
 
     return(
       <div>
         <p>Potential Matches:</p>
-        <ul>
         {matches.sort().slice(0, 5).map( match => (
-          <li>{match}</li>
-        ))}
-        </ul>
+          <button onClick={() => this.props.handleClick(match)}>{match}</button>
+        ))}        
       </div>
     ); 
   }
 }
 
-class Forecast extends React.Component<{handleClick: () => void, 
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void, location:string}, {}> {
+class Forecast extends React.Component<{handleClick: (name: string) => void, 
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void, location:string,
+  locations: locationMetaData[]}, {}> {
 
 
   render(){
     return (
       <div>
-        <LocationInput 
-          handleClick={() => this.props.handleClick()} 
-          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}
-        />
-        <LocationMatches location={this.props.location} />
+        <LocationInput handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}/>
+        <LocationMatches 
+          location={this.props.location} 
+          locations={this.props.locations} 
+          handleClick={(name: string) => this.props.handleClick(name)}/>
       </div>
     );
   }
