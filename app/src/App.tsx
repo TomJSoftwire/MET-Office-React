@@ -1,16 +1,8 @@
 import React, { Component,useState,useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Header from './Header';
-import LocationWeatherDisplay from './LocationWeatherDisplay';
+import LocationWeatherDisplay,{WeatherDataInput} from './LocationWeatherDisplay';
 
-type weatherDataInput = {
-  SiteRep : {
-      DV :{
-          type:string
-      }
-  }
-}
 
 type locationDataInput = {
   Locations: {
@@ -40,10 +32,10 @@ interface IProps {
 }
 
 interface IState {
-  locationId: number
-  locationData: weatherDataInput,
+  locationId: number,
   locationMetaData: locationDataInput,
-  location: string
+  location: string,
+  locationData: WeatherDataInput|undefined
 }
 
 
@@ -53,18 +45,12 @@ export default class App extends Component<IProps,IState> {
     this.state = {
       locationId: 0,
       location: "",
-      locationData: {
-        SiteRep : {
-            DV :{
-                type: "TEST"
-            }
-        }
-      },
       locationMetaData: {
         Locations: {
           Location: []
         }
-      }
+      },
+      locationData: undefined
     }
   }
 fetchLocationData(){
@@ -74,7 +60,7 @@ fetchLocationData(){
         "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/" + this.state.locationId + "?res=3hourly&key=" + key
   fetch(targetUrl)
         .then(response => response.json())
-        .then((json:weatherDataInput) => {
+        .then((json:WeatherDataInput) => {
             this.setState({locationData:json})
         })
 }
@@ -92,6 +78,7 @@ fetchLocationsMetadata(){
 componentDidUpdate(){
   //this.fetchLocationData()
 }
+
 componentDidMount(){
   //this.fetchLocationData()
   this.fetchLocationsMetadata()
@@ -117,6 +104,16 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
   });
 }
 
+handleClick(){
+  this.fetchLocationData()
+}
+
+handleChange(event: React.ChangeEvent<HTMLInputElement>){
+  this.setState({
+    locationName: event.target.value
+  });
+}
+
   public render(){
   const {links,brand} = navigation;
   return (    
@@ -129,13 +126,15 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
           handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
           location={this.state.location}
         />
+        {this.state.locationData && <LocationWeatherDisplay locationData={this.state.locationData}/>}
       </div>
     </div>
   );
   }
 }
 
-class LocationInput extends React.Component<{handleClick: () => void, 
+class LocationInput extends React.Component<{
+  handleClick: () => void, 
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void}, {}> {
 
   render(){
@@ -182,9 +181,9 @@ class LocationMatches extends React.Component <{location: string}, {}>{
   }
 }
 
-
 class Forecast extends React.Component<{handleClick: () => void, 
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void, location:string}, {}> {
+
 
   render(){
     return (
