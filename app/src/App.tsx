@@ -1,4 +1,4 @@
-import React, { Component,useState,useEffect } from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import Header from './Header';
 import LocationWeatherDisplay,{WeatherDataInput} from './LocationWeatherDisplay';
@@ -62,18 +62,8 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
     <div className="App">
       <Header brand={brand} links={links} />
         {this.state.locationData && <LocationWeatherDisplay locationData={this.state.locationData}/>}
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       <div>
+        <br/>
         <Forecast handleClick={() => this.handleClick()} handleChange={(e:React.ChangeEvent<HTMLInputElement>) => this.handleChange(e)} locationName={this.state.locationName}/>
       </div>
     </div>
