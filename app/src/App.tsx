@@ -1,4 +1,4 @@
-import React, { Component,useState,useEffect } from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import Header from './Header';
 import LocationWeatherDisplay,{WeatherDataInput} from './LocationWeatherDisplay';
@@ -109,6 +109,7 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
   return (    
     <div className="App">
       <Header brand={brand} links={links} />
+
       <div>
         <Forecast 
           handleClick={() => this.handleClick()} 
@@ -116,6 +117,7 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
           location={this.state.location}
         />
         {this.state.locationData && <LocationWeatherDisplay locationData={this.state.locationData}/>}
+
       </div>
     </div>
   );
