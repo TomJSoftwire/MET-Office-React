@@ -141,8 +141,7 @@ function ForecastDay(props: {data: ForecastDayData}){
     const dayData = props.data;
     const rawDateArr:number[] = dayData.value.slice(0,10).split("-").map(j => parseInt(j))
     const forecastDate = new Date (rawDateArr[0],rawDateArr[1]-1,rawDateArr[2])
-    const formattedDate = daysOfWeek[forecastDate.getDay()]
-        + " " + forecastDate.getDate() +"/" + (forecastDate.getMonth()+1) + "/" +forecastDate.getFullYear()
+    const formattedDate = daysOfWeek[forecastDate.getDay()] + " " + forecastDate.getDate() +"/" + (forecastDate.getMonth()+1) + "/" +forecastDate.getFullYear()
     const Blocks = dayData.Rep.map(i => <ForecastBlock propData={i} key={i.$}/> )
     return(
         <Content key={formattedDate}>
