@@ -44,7 +44,7 @@ export default class App extends Component<IProps,IState> {
     super(props);
     this.state = {
       locationId: 0,
-      location: "",
+      location: " ",
       locationMetaData: {
         Locations: {
           Location: []
@@ -84,20 +84,16 @@ componentDidMount(){
   this.fetchLocationsMetadata()
 }
 
-handleClick(){
+handleLocationClick(locationName: string){
   let i: number
   for(i = 0; i < this.state.locationMetaData.Locations.Location.length; i++){
-    this.matchLocation(this.state.locationMetaData.Locations.Location[i])
+    this.matchLocation(this.state.locationMetaData.Locations.Location[i], locationName)
   }
 }
 
-handleLocationClick(locationName: string){
-  this.setState({location: locationName}, () => this.handleClick())
-}
-
-matchLocation(data: locationMetaData){
-  console.log("Matching: " + this.state.location + " with " + data.name)
-  if (data.name === this.state.location){
+matchLocation(data: locationMetaData, locationName: string){
+  console.log("Matching: " + locationName + " with " + data.name)
+  if (data.name === locationName){
     return this.setState({locationId: data.id}, () => this.fetchLocationData()) 
   }
 }
@@ -134,10 +130,10 @@ class LocationInput extends React.Component<{handleChange: (event: React.ChangeE
   render(){
     return (
       <div>
-        <label>Location:</label>
         <input 
+          className="LocationInput"
           type="text" 
-          placeholder="Enter Location" 
+          placeholder="Please enter a location, then click on one of the matches below:" 
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}>
         </input>
       </div>
@@ -159,11 +155,13 @@ class LocationMatches extends React.Component <{location: string, locations: loc
     }
 
     return(
-      <div>
-        <p>Potential Matches:</p>
-        {matches.sort().slice(0, 5).map( match => (
-          <button onClick={() => this.props.handleClick(match)}>{match}</button>
-        ))}        
+      <div className="PotentialMatches">
+        <hr className="PotentialMatchesHR"></hr>
+        <div className="PotentialMatchesList">
+          {matches.sort().slice(0, 5).map( match => (
+            <button className="PotentialMatchesButton" onClick={() => this.props.handleClick(match)}>{match}</button>
+          ))}      
+        </div>
       </div>
     ); 
   }
@@ -176,7 +174,7 @@ class Forecast extends React.Component<{handleClick: (name: string) => void,
 
   render(){
     return (
-      <div>
+      <div className="Input">
         <LocationInput handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}/>
         <LocationMatches 
           location={this.props.location} 
