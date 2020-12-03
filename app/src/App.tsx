@@ -12,6 +12,22 @@ type weatherDataInput = {
   }
 }
 
+type locationDataInput = {
+  Locations: {
+    Location: locationMetaData[]
+  }
+}
+
+type locationMetaData = {
+  elevation: string,
+  id: number,
+  latitude: number,
+  longitude: number,
+  name: string,
+  region: string,
+  unitaryAuthArea: string
+}
+
 const navigation = {
   brand: {name:"The Weather Site",to:"/"},
   links: [
@@ -24,8 +40,10 @@ interface IProps {
 }
 
 interface IState {
-  locationId : string,
-  locationData: weatherDataInput
+  locationId: number
+  locationData: weatherDataInput,
+  locationMetaData: locationDataInput,
+  location: string
 }
 
 
@@ -33,12 +51,18 @@ export default class App extends Component<IProps,IState> {
   constructor(props:any){
     super(props);
     this.state = {
-      locationId :"3840",
+      locationId: 0,
+      location: "",
       locationData: {
         SiteRep : {
             DV :{
                 type: "TEST"
             }
+        }
+      },
+      locationMetaData: {
+        Locations: {
+          Location: []
         }
       }
     }
@@ -54,11 +78,43 @@ fetchLocationData(){
             this.setState({locationData:json})
         })
 }
+
+fetchLocationsMetadata(){
+  console.log("Fetching location metadata...")
+  const targetUrl = "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=33668077-5e60-4413-b22c-e4a5795397d7"
+  fetch(targetUrl)
+    .then(response => response.json())
+    .then((json:locationDataInput) => {
+      this.setState({locationMetaData:json})
+    })
+}
+
 componentDidUpdate(){
   //this.fetchLocationData()
 }
 componentDidMount(){
   //this.fetchLocationData()
+  this.fetchLocationsMetadata()
+}
+
+handleClick(){
+  let i: number
+  for(i = 0; i < this.state.locationMetaData.Locations.Location.length; i++){
+    this.matchLocation(this.state.locationMetaData.Locations.Location[i])
+  }
+}
+
+matchLocation(data: locationMetaData){
+  console.log("Matching: " + this.state.location + " with " + data.name)
+  if (data.name === this.state.location){
+    return this.setState({locationId: data.id}, () => this.fetchLocationData()) 
+  }
+}
+
+handleChange(event: React.ChangeEvent<HTMLInputElement>){
+  this.setState({
+    location: event.target.value
+  });
 }
 
   public render(){
@@ -67,19 +123,12 @@ componentDidMount(){
     <div className="App">
       <Header brand={brand} links={links} />
         <LocationWeatherDisplay locationData={this.state.locationData}/>
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       <div>
-        <Forecast />
+        <Forecast 
+          handleClick={() => this.handleClick()} 
+          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
+          location={this.state.location}
+        />
       </div>
     </div>
   );
@@ -134,37 +183,19 @@ class LocationMatches extends React.Component <{location: string}, {}>{
 }
 
 
-class Forecast extends React.Component<{}, {location: string}> {
-
-  constructor(props: string){
-    super(props);
-    this.state = {
-      location: '',
-    }
-  }
-
-  handleClick(){
-    alert(this.state.location);
-  }
-
-  handleChange(event: React.ChangeEvent<HTMLInputElement>){
-    this.setState({
-      location: event.target.value
-    });
-  }
+class Forecast extends React.Component<{handleClick: () => void, 
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void, location:string}, {}> {
 
   render(){
     return (
       <div>
         <LocationInput 
-          handleClick={() => this.handleClick()} 
-          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
+          handleClick={() => this.props.handleClick()} 
+          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}
         />
-        <LocationMatches location={this.state.location} />
+        <LocationMatches location={this.props.location} />
       </div>
     );
   }
 
 }
-
-export default App;
