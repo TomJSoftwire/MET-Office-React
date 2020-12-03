@@ -42,12 +42,10 @@ const Content = styled.div`
     align-items:center;
 `
 const Td = styled.div`
-    //width:100%;
     height:60px;
-    text-align:right;
-    //border:red solid;
+    text-align:center;
 `
-const Th = styled.td`
+const Th = styled.div`
     width:15vw;
     text-align:left;
     font-weight:bold;
@@ -59,7 +57,6 @@ const Table = styled.div`
     justify-content:space-between;
     height:15vh;
     width:70vw;
-    //border:solid blue;
 `
 const Spacer = styled.div`
     display:flex;
@@ -67,7 +64,6 @@ const Spacer = styled.div`
     justify-content:right;
     height:15vh;
     width:80vw;
-    //border:solid blue;
 `
 const Tr = styled.div`
     height:100%;
@@ -75,9 +71,6 @@ const Tr = styled.div`
     display:flex;
     flex-flow:column;
     flex-basis:100%;
-    //align-items:flex-end;
-    //justify-content:right;
-    //border:solid green;
 `
 
 export default function LocationWeatherDisplay(props: {locationData:WeatherDataInput}){
@@ -89,7 +82,7 @@ export default function LocationWeatherDisplay(props: {locationData:WeatherDataI
                             .join(" ")
     const forecastData = data.Period
     const Days = forecastData.map(day => {return(
-            <ForecastDay data={day} />
+            <ForecastDay data={day} key={day.value}/>
     )})
     return (
         <div>
@@ -106,21 +99,17 @@ function ForecastDay(props: {data: ForecastDayData}){
     const forecastDate = new Date (rawDateArr[0],rawDateArr[1]-1,rawDateArr[2])
     const formattedDate = daysOfWeek[forecastDate.getDay()]
         + " " + forecastDate.getDate() +"/" + (forecastDate.getMonth()+1) + "/" +forecastDate.getFullYear()
-    const Blocks = dayData.Rep.map(i => <ForecastBlock propData={i} /> )
-
-    console.log(rawDateArr)
-    console.log(forecastDate)
-
+    const Blocks = dayData.Rep.map(i => <ForecastBlock propData={i} key={i.$}/> )
     return(
-        <Content>
+        <Content key={formattedDate}>
             <h3>{formattedDate}</h3>
             <Table>
                 <Tr>
-                    <Th>Time</Th>
-                    <Th>Weather</Th>
-                    <Th>Temperature</Th>
-                    <Th>Feels Like</Th>
-                    <Th>Precipitation Chance</Th>
+                    <Th key="time">Time</Th>
+                    <Th key="weatherType">Weather</Th>
+                    <Th key="temperature">Temperature</Th>
+                    <Th key="feelsLike">Feels Like</Th>
+                    <Th key="precipChance">Precipitation Chance</Th>
                 </Tr>
                 <Spacer>
                     {Blocks}
@@ -139,12 +128,12 @@ function ForecastBlock(props: {propData:ForecastBlockData}){
     const weatherType = data.W
     const precipChance = data.Pp
     return(
-        <Tr>
-            <Td>{time}</Td>
-            <Td><FontAwesomeIcon icon={faSun} size="1x"/></Td>
-            <Td>{temperature} °C</Td>
-            <Td>{feelsLike} °C</Td>
-            <Td>{precipChance} %</Td>
+        <Tr key={time}>
+            <Td key="time">{time}</Td>
+            <Td key="weatherType"><FontAwesomeIcon icon={faSun} size="1x"/></Td>
+            <Td key="temperature">{temperature} °C</Td>
+            <Td key="feelsLike">{feelsLike} °C</Td>
+            <Td key="precipChance">{precipChance} %</Td>
         </Tr>
     )
 }
