@@ -104,22 +104,11 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
   });
 }
 
-handleClick(){
-  this.fetchLocationData()
-}
-
-handleChange(event: React.ChangeEvent<HTMLInputElement>){
-  this.setState({
-    locationName: event.target.value
-  });
-}
-
   public render(){
   const {links,brand} = navigation;
   return (    
     <div className="App">
       <Header brand={brand} links={links} />
-        <LocationWeatherDisplay locationData={this.state.locationData}/>
       <div>
         <Forecast 
           handleClick={() => this.handleClick()} 
