@@ -130,7 +130,6 @@ export default function LocationWeatherDisplay(props: {locationData:WeatherDataI
     )})
     return (
         <div>
-            <h2>{locationName}</h2>
                 {Days}
         </div>
     )
