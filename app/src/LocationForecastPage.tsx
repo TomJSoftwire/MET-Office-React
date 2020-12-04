@@ -32,8 +32,12 @@ interface IState {
 
 
 export default class LocationForecastPage extends Component<IProps,IState> { 
+
+  forecast: React.RefObject<Forecast>;
+
   constructor(props:any){
     super(props);
+    this.forecast = React.createRef();
     this.state = {
       locationId: 0,
       location: " ",
@@ -55,6 +59,7 @@ fetchLocationData(){
         .then((json:WeatherDataInput) => {
             this.setState({locationData:json})
         })
+  this.resetInputField()
 }
 
 fetchLocationsMetadata(){
@@ -76,6 +81,13 @@ componentDidMount(){
   this.fetchLocationsMetadata()
 }
 
+resetInputField(){
+  if (this.forecast.current?.inputElement.current?.inputField.current){
+    this.forecast.current.inputElement.current.inputField.current.value = this.state.location;
+    this.setState({location: " "})
+  }
+}
+
 handleLocationClick(locationName: string){
   let i: number
   for(i = 0; i < this.state.locationMetaData.Locations.Location.length; i++){
@@ -86,7 +98,7 @@ handleLocationClick(locationName: string){
 matchLocation(data: locationMetaData, locationName: string){
   console.log("Matching: " + locationName + " with " + data.name)
   if (data.name === locationName){
-    return this.setState({locationId: data.id}, () => this.fetchLocationData()) 
+    return this.setState({locationId: data.id, location: locationName}, () => this.fetchLocationData()) 
   }
 }
 
@@ -102,6 +114,7 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
 
       <div>
         <Forecast 
+          ref={this.forecast}
           handleClick={(name: string) => this.handleLocationClick(name)} 
           handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
           location={this.state.location}
@@ -117,10 +130,18 @@ handleChange(event: React.ChangeEvent<HTMLInputElement>){
 
 class LocationInput extends React.Component<{handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void}, {}> {
 
+  inputField: React.RefObject<HTMLInputElement>;
+
+  constructor(props:any){
+    super(props);
+    this.inputField = React.createRef();
+  }
+  
   render(){
     return (
       <div>
         <input 
+          ref = {this.inputField}
           className="LocationInput"
           type="text" 
           placeholder="Please enter a location, then click on one of the matches below:" 
@@ -161,11 +182,20 @@ class Forecast extends React.Component<{handleClick: (name: string) => void,
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void, location:string,
   locations: locationMetaData[]}, {}> {
 
+  inputElement: React.RefObject<LocationInput>;
+
+  constructor(props:any){
+    super(props);
+    this.inputElement = React.createRef();
+  }
 
   render(){
     return (
       <div className="Input">
-        <LocationInput handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}/>
+        <LocationInput 
+          ref = {this.inputElement}
+          handleChange={(event: React.ChangeEvent<HTMLInputElement>) => this.props.handleChange(event)}
+        />
         <LocationMatches 
           location={this.props.location} 
           locations={this.props.locations} 
