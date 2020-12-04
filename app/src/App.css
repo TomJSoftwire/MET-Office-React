@@ -46,6 +46,8 @@
   width: 40%;
   border: none;
   margin-top: 20px;
+  margin-left: 20px;
+  outline: none;
 }
 
 .PotentialMatches{
@@ -65,7 +67,7 @@
 }
 
 .PotentialMatchesHR{
-  width: 98%;
+  width: 100%;
 }
 
 .PotentialMatchesButton{
@@ -80,6 +82,7 @@ button{
   background-color: white;
   margin: 3px;
   transition-duration: 0.4s;
+  outline:none;
 }
 
 button:hover{
